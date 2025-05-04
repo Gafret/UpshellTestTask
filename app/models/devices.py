@@ -17,3 +17,15 @@ class Device(BaseDevice, table=True):
     __tablename__ = "devices"
 
     id: int | None = Field(primary_key=True, default=None, description="ID девайса")
+
+    class Config:
+        json_schema_extra = {
+            "examples": [
+                {
+                    "id": 1,
+                    "name": "XPS 13",
+                    "brand": "Dell",
+                    "price": 1299.99
+                }
+            ]
+        }

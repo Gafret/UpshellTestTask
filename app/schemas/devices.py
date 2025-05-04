@@ -9,15 +9,26 @@ class DeviceCreate(BaseDevice):
 
     pass
 
+    class Config:
+        json_schema_extra = {
+            "examples": [
+                {
+                    "name": "XPS 13",
+                    "brand": "Dell",
+                    "price": 1299.99
+                }
+            ]
+        }
+
 
 class DeviceFilterQueryParams(BaseModel):
     """Параметры по которым фильтруются девайсы"""
 
-    brand: DeviceBrand = Field(description="Производитель девайса")
-    price_min: int | None = Field(default=None, description="Минимальная цена девайса")
-    price_max: int | None = Field(default=None, description="Максимальная цена девайса")
-    page: PageField | None = Field(default=1, description="Номер получаемой страницы результатов запроса")
-    page_size: PageSizeField | None = Field(default=10, description="Количество элементов на каждой странице")
+    brand: DeviceBrand = Field(description="Фильтр по бренду")
+    price_min: int | None = Field(default=None, description="Минимальная цена")
+    price_max: int | None = Field(default=None, description="Максимальная цена")
+    page: PageField | None = Field(default=1, description="Номер страницы для пагинации")
+    page_size: PageSizeField | None = Field(default=10, description="Количество элементов на странице")
 
     @model_validator(mode="after")
     def check_price_range(self):
@@ -41,6 +52,27 @@ class DeviceFilterResult(BaseModel):
     items: list[BaseDevice] = Field(description="Элементы, полученные после фильтрации")
     total: int = Field(default=0, description="Итоговое количество, полученных элементов")
 
+    class Config:
+        json_schema_extra = {
+            "examples": [
+                {
+                    "items": [
+                        {
+                            "name": "iPhone 13",
+                            "brand": "Apple",
+                            "price": 999
+                        },
+                        {
+                            "name": "Samsung Galaxy S21",
+                            "brand": "Samsung",
+                            "price": 899
+                        }
+                    ],
+                    "total": 2
+                }
+            ]
+        }
+
 
 class DeviceOrder(BaseDevice):
     """Заказ на некоторый девайс внутри корзины пользователя"""
@@ -53,6 +85,28 @@ class UserDeviceCart(BaseModel):
     """Корзина пользователя"""
 
     items: list[DeviceOrder] = Field(description="Список позиций в корзине покупателя")
+
+    class Config:
+        json_schema_extra = {
+            "examples": [
+                {
+                    "items": [
+                        {
+                            "name": "Smartphone X",
+                            "brand": "TechBrand",
+                            "quantity": 2,
+                            "price": 399.99
+                        },
+                        {
+                            "name": "Laptop Pro",
+                            "brand": "CompTech",
+                            "quantity": 1,
+                            "price": 1299.99
+                        }
+                    ]
+                }
+            ]
+        }
 
 
 class FulfilledDeviceOrder(DeviceOrder):
@@ -68,3 +122,28 @@ class CartPurchaseResult(BaseModel):
     purchased_items: list[FulfilledDeviceOrder] | None = Field(default_factory=list,
                                                                description="Список, купленных позиций")
     total_purchase_price: float | None = Field(default=None, description="Итоговая стоимость")
+
+    class Config:
+        json_schema_extra = {
+            "examples": [
+                {
+                    "purchasedItems": [
+                        {
+                            "name": "Smartphone X",
+                            "brand": "TechBrand",
+                            "unitPrice": 399.99,
+                            "quantity": 2,
+                            "totalPrice": 799.98
+                        },
+                        {
+                            "name": "Laptop Pro",
+                            "brand": "CompTech",
+                            "unitPrice": 1299.99,
+                            "quantity": 1,
+                            "totalPrice": 1299.99
+                        }
+                    ],
+                    "totalPurchasePrice": 2099.97
+                }
+            ]
+        }

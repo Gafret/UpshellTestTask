@@ -2,29 +2,25 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi.params import Depends, Query
-from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, \
-    HTTP_200_OK
+from starlette.status import HTTP_201_CREATED, HTTP_200_OK
 
 from app.backend.const import Roles
 from app.backend.dependencies import check_permission, check_jwt_token
+from app.backend.openapi import DevicesRouteResponses
 from app.backend.session import SessionDependency
 from app.models.devices import Device
 from app.schemas.devices import DeviceFilterQueryParams, UserDeviceCart, DeviceCreate, DeviceFilterResult, \
     CartPurchaseResult
 from app.services.devices import DeviceDataManager, DeviceService
 
-router = APIRouter(tags=["devices"])
+router = APIRouter(tags=["Товары"])
 
 
 @router.post("/device",
              status_code=HTTP_201_CREATED,
-             description="Дает пользователю с ролью админа добавить устройство",
-             responses={
-                 HTTP_201_CREATED: {"description": "Девайс добавлен в каталог"},
-                 HTTP_400_BAD_REQUEST: {"description": "Отправленная информация не прошла валидацию"},
-                 HTTP_401_UNAUTHORIZED: {"description": "Неавторизованный запрос"},
-                 HTTP_403_FORBIDDEN: {"description": "Недостаточно прав"},
-             },
+             name="Добавить товар в каталог",
+             description="Добавление нового товара в каталог. Доступно только для администраторов",
+             responses=DevicesRouteResponses.add_device_responses,
              dependencies=[Depends(check_permission(Roles.ADMIN))])
 async def add_device(device_info: DeviceCreate, session: SessionDependency) -> Device:
     device_info = Device.model_validate(device_info)
@@ -35,11 +31,9 @@ async def add_device(device_info: DeviceCreate, session: SessionDependency) -> D
 
 @router.get("/devices",
             status_code=HTTP_200_OK,
-            description="Позволяет получить все девайсы по определенным параметрам фильтрования",
-            responses={
-                 HTTP_200_OK: {"description": "Получен список фильтрованных девайсов"},
-                 HTTP_400_BAD_REQUEST: {"description": "Ошибка в параметрах фильтрации"},
-            })
+            name="Получить список доступных к продаже товаров",
+            description="Возвращает список устройств, доступных для покупки",
+            responses=DevicesRouteResponses.devices_responses)
 async def get_device_catalog(filters: Annotated[DeviceFilterQueryParams, Query()],
                              session: SessionDependency) -> DeviceFilterResult:
     devices = DeviceService(session).get_devices(filters)
@@ -49,12 +43,10 @@ async def get_device_catalog(filters: Annotated[DeviceFilterQueryParams, Query()
 
 @router.post("/buy",
              status_code=HTTP_200_OK,
-             description="Оформляет покупку корзины пользователя",
-             responses={
-                 HTTP_200_OK: {"description": "Покупка прошла успешно"},
-                 HTTP_400_BAD_REQUEST: {"description": "Ошибка в составлении корзины"},
-                 HTTP_401_UNAUTHORIZED: {"description": "Неавторизованный пользователь"},
-             },
+             name="Покупка выбранных товаров",
+             description="Эндпоинт для покупки выбранных товаров в интернет-магазине электроники. "
+                         "Доступно только для авторизованных пользователей.",
+             responses=DevicesRouteResponses.buy_responses,
              dependencies=[Depends(check_jwt_token)])
 async def purchase_device(user_cart: UserDeviceCart, session: SessionDependency) -> CartPurchaseResult:
     purchase_result = DeviceService(session).purchase_devices(user_cart)
