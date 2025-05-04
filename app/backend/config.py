@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
+    """Параметры конфигурации API, берутся с .env файла"""
+
     database: str
     hash_algo: str = "HS256"
     secret_key: str

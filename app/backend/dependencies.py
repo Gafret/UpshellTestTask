@@ -11,6 +11,8 @@ from app.services.auth import AuthService
 
 
 class CustomHTTPBearer(HTTPBearer):
+    """Кастомные Bearer для прописывания своих ошибок"""
+
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials:
         try:
             credentials = await super().__call__(request)
@@ -26,13 +28,17 @@ oauth2_scheme = CustomHTTPBearer()
 
 
 def check_jwt_token(token: Annotated[HTTPAuthorizationCredentials, Depends(oauth2_scheme)]) -> dict:
+    """Проверяет есть ли токен у пользователя"""
+
     return AuthService.verify_jwt_token(token.credentials)
 
 
 def check_permission(required_role: Roles):
+    """Проверяет роль пользователя"""
+
     def role_checker(token: Annotated[dict, Depends(check_jwt_token)]) -> dict:
         if token.get("role") != required_role:
-            raise HTTPException(status_code=403, detail="Пользователь не имеет прав доступа для этой операции"
-)
+            raise HTTPException(status_code=403, detail="Пользователь не имеет прав доступа для этой операции")
         return token
+
     return role_checker

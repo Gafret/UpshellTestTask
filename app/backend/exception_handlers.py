@@ -7,6 +7,8 @@ from app.schemas.base import ErrorResponse
 
 
 async def http_exception_handler(request: Request, exc: HTTPException):
+    """Хэндлер любых HTTPException, трансформирующий их в ErrorResponse"""
+
     content = ErrorResponse(error=exc.detail)
 
     return JSONResponse(
@@ -16,6 +18,8 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Хэндлер для ошибок валидации Pydantic'а"""
+
     messages = ""
 
     for err in exc.errors():
@@ -47,6 +51,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 async def server_exception_handler(request: Request, exc: Exception):
+    """Хэндлер любых ошибок происходящих на сервере"""
+
     content = ErrorResponse(error="Произошла ошибка на сервере. Попробуйте позже.")
 
     return JSONResponse(

@@ -16,6 +16,8 @@ SessionFactory = sessionmaker(
 
 
 def get_session() -> Session:
+    """Выдает БД сессию"""
+
     session = SessionFactory()
     try:
         yield session

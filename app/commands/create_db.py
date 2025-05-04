@@ -1,4 +1,4 @@
-from sqlmodel import create_engine, SQLModel
+from sqlmodel import create_engine
 
 from app.backend.config import config
 from app.models.auth import User

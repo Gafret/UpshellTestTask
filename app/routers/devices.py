@@ -20,8 +20,8 @@ router = APIRouter(tags=["devices"])
              status_code=HTTP_201_CREATED,
              description="Дает пользователю с ролью админа добавить устройство",
              responses={
-                 HTTP_400_BAD_REQUEST: {"description": "Отправленная информация не прошла валидацию"},
                  HTTP_201_CREATED: {"description": "Девайс добавлен в каталог"},
+                 HTTP_400_BAD_REQUEST: {"description": "Отправленная информация не прошла валидацию"},
                  HTTP_401_UNAUTHORIZED: {"description": "Неавторизованный запрос"},
                  HTTP_403_FORBIDDEN: {"description": "Недостаточно прав"},
              },
@@ -37,8 +37,8 @@ async def add_device(device_info: DeviceCreate, session: SessionDependency) -> D
             status_code=HTTP_200_OK,
             description="Позволяет получить все девайсы по определенным параметрам фильтрования",
             responses={
-                 HTTP_400_BAD_REQUEST: {"description": "Ошибка в параметрах фильтрации"},
                  HTTP_200_OK: {"description": "Получен список фильтрованных девайсов"},
+                 HTTP_400_BAD_REQUEST: {"description": "Ошибка в параметрах фильтрации"},
             })
 async def get_device_catalog(filters: Annotated[DeviceFilterQueryParams, Query()],
                              session: SessionDependency) -> DeviceFilterResult:
@@ -51,8 +51,8 @@ async def get_device_catalog(filters: Annotated[DeviceFilterQueryParams, Query()
              status_code=HTTP_200_OK,
              description="Оформляет покупку корзины пользователя",
              responses={
-                 HTTP_400_BAD_REQUEST: {"description": "Ошибка в составлении корзины"},
                  HTTP_200_OK: {"description": "Покупка прошла успешно"},
+                 HTTP_400_BAD_REQUEST: {"description": "Ошибка в составлении корзины"},
                  HTTP_401_UNAUTHORIZED: {"description": "Неавторизованный пользователь"},
              },
              dependencies=[Depends(check_jwt_token)])
