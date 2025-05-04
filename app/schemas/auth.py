@@ -3,7 +3,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, EmailStr
 
-from app.utils.validators import PasswordField
+from app.utils.validators import PasswordField, LoginPasswordField
 
 TokenField = Annotated[str, Field(min_length=32, max_length=256)]
 
@@ -91,6 +91,8 @@ class TokenPair(BaseModel):
 
 class LoginRequest(SignupRequest):
     """Модель запроса на логин"""
+
+    password: LoginPasswordField = Field(description="Пароль пользователя")
 
     class Config:
         extra = "forbid"

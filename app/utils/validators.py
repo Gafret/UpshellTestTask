@@ -23,6 +23,15 @@ def validate_password(password: str) -> str:
     return password
 
 
+def validate_login_password(password: str) -> str:
+    if len(password) < 8 or len(password) > 20:
+        raise FieldValidationException(
+            "value_error",
+            "Неверный формат пароля"
+        )
+    return password
+
+
 def validate_page_number(page: int) -> int:
     if page <= 0:
         raise FieldValidationException("value_error", "Номер страницы должен быть больше 0")
@@ -82,3 +91,4 @@ PageField = Annotated[int, AfterValidator(validate_page_number)]
 PageSizeField = Annotated[int, AfterValidator(validate_page_size)]
 
 PasswordField = Annotated[str, AfterValidator(validate_password)]
+LoginPasswordField = Annotated[str, AfterValidator(validate_login_password)]
