@@ -24,7 +24,7 @@ class DeviceCreate(BaseDevice):
 class DeviceFilterQueryParams(BaseModel):
     """Параметры по которым фильтруются девайсы"""
 
-    brand: DeviceBrand = Field(description="Фильтр по бренду")
+    brand: DeviceBrand | None = Field(default=None, description="Фильтр по бренду")
     price_min: int | None = Field(default=None, description="Минимальная цена")
     price_max: int | None = Field(default=None, description="Максимальная цена")
     page: PageField | None = Field(default=1, description="Номер страницы для пагинации")

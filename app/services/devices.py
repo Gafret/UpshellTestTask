@@ -85,9 +85,11 @@ class DeviceDataManager(BaseDataManager):
         return count
 
     def filter_devices(self, filter_params: DeviceFilterQueryParams) -> list[Device] | None:
-        query = select(Device).where(Device.brand == filter_params.brand)
+        query = select(Device)
         offset = (filter_params.page - 1) * filter_params.page_size
 
+        if filter_params.brand is not None:
+            query = query.where(Device.brand == filter_params.brand)
         if filter_params.price_min is not None:
             query = query.where(Device.price >= filter_params.price_min)
         if filter_params.price_max is not None:
