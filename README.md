@@ -26,7 +26,8 @@ pip install -r requirements.txt
 DATABASE="postgresql://postgres:password@localhost:5432/store"
 SECRET_KEY="KEY"
 HASH_ALGO="HS256"
-TOKEN_TTL_MINUTES=60
+ACCESS_TOKEN_TTL_MINUTES=60
+REFRESH_TOKEN_TTL_MINUTES=6000
 ```
 
 ### Запускаете
