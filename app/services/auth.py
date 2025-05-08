@@ -34,7 +34,7 @@ class JWTTokenMixin:
     @staticmethod
     def create_jwt_token(data: dict, expires_delta=timedelta(minutes=config.access_token_ttl_minutes)):
         to_encode = data.copy()
-        expire = datetime.now(dt.UTC) + expires_delta  # Устанавливаем время жизни токена
+        expire = datetime.now(dt.UTC) + expires_delta
         to_encode.update({"exp": expire})
         return jwt.encode(to_encode, config.secret_key, algorithm=config.hash_algo)
 
