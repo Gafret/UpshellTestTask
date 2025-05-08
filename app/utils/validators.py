@@ -130,6 +130,11 @@ def validate_device_price(price: float) -> float:
     return price
 
 
+IntField = Annotated[
+    int,
+    BeforeValidator(type_validation_wrapper(int, ErrorTexts.PRICE_TYPE_ERROR))
+]
+
 DevicePrice = Annotated[
     float,
     BeforeValidator(type_validation_wrapper(float, ErrorTexts.PRICE_TYPE_ERROR)),

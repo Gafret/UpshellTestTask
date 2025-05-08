@@ -4,7 +4,7 @@ from app.backend.const import ErrorTexts
 from app.backend.custom_exceptions import FieldValidationException
 from app.backend.openapi.schema_examples import DeviceSchemas
 from app.models.devices import BaseDevice
-from app.utils.validators import PageField, PageSizeField, OrderDevicePrice, OrderDeviceQuantity, DeviceBrand
+from app.utils.validators import PageField, PageSizeField, OrderDevicePrice, OrderDeviceQuantity, DeviceBrand, IntField
 
 
 class DeviceCreate(BaseDevice):
@@ -21,8 +21,8 @@ class DeviceFilterQueryParams(BaseModel):
     """Параметры по которым фильтруются девайсы"""
 
     brand: DeviceBrand | None = Field(default=None, description="Фильтр по бренду")
-    price_min: int | None = Field(default=None, description="Минимальная цена")
-    price_max: int | None = Field(default=None, description="Максимальная цена")
+    price_min: IntField | None = Field(default=None, description="Минимальная цена")
+    price_max: IntField | None = Field(default=None, description="Максимальная цена")
     page: PageField | None = Field(default=1, description="Номер страницы для пагинации")
     page_size: PageSizeField | None = Field(default=10, description="Количество элементов на странице")
 
@@ -35,17 +35,6 @@ class DeviceFilterQueryParams(BaseModel):
                 ErrorTexts.MAX_PRICE_LESS_THAN_MIN_PRICE
             )
         return self
-
-    @model_validator(mode="after")
-    def check_has_at_least_one_field(self):
-        values = self.model_dump()
-        for k, v in values.items():
-            if v is not None:
-                return self
-        raise FieldValidationException(
-            "value_error",
-            "Должен быть указан хотя бы один параметр фильтрации или пагинации"
-        )
 
     class Config:
         extra = "forbid"
@@ -91,8 +80,10 @@ class FulfilledDeviceOrder(DeviceOrder):
 class CartPurchaseResult(BaseModel):
     """Чек получаемый после покупки корзины"""
 
-    purchased_items: list[FulfilledDeviceOrder] | None = Field(default_factory=list,
-                                                               description="Список, купленных позиций")
+    purchased_items: list[FulfilledDeviceOrder] | None = Field(
+        default_factory=list,
+        description="Список, купленных позиций"
+    )
     total_purchase_price: float | None = Field(default=None, description="Итоговая стоимость")
 
     class Config:
