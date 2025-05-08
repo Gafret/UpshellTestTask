@@ -1,11 +1,9 @@
 import uuid
-from typing import Annotated
 
 from pydantic import BaseModel, Field, EmailStr
 
-from app.utils.validators import PasswordField, LoginPasswordField
-
-TokenField = Annotated[str, Field(min_length=32, max_length=256)]
+from app.backend.openapi.schema_examples import AuthSchemas
+from app.utils.validators import PasswordField, LoginPasswordField, TokenField
 
 
 class SignupRequest(BaseModel):
@@ -15,14 +13,8 @@ class SignupRequest(BaseModel):
     password: PasswordField = Field(description="Пароль пользователя")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "email": "example@domain.com",
-                    "password": "Password123"
-                }
-            ]
-        }
+        extra = "forbid"
+        json_schema_extra = AuthSchemas.SIGNUP_REQUEST
 
 
 class SuccessResponse(BaseModel):
@@ -32,14 +24,7 @@ class SuccessResponse(BaseModel):
     user_uuid: uuid.UUID = Field(serialization_alias="user_id", description="ID созданного аккаунта")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "message": "Регистрация прошла успешно",
-                    "userId": "123e4567-e89b-12d3-a456-426614174000"
-                }
-            ]
-        }
+        json_schema_extra = AuthSchemas.SUCCESS_RESPONSE
 
 
 class RefreshToken(BaseModel):
@@ -48,13 +33,7 @@ class RefreshToken(BaseModel):
     refresh_token: TokenField = Field(description="Refresh токен")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                }
-            ]
-        }
+        json_schema_extra = AuthSchemas.REFRESH_TOKEN
 
 
 class AccessToken(BaseModel):
@@ -63,13 +42,7 @@ class AccessToken(BaseModel):
     access_token: TokenField = Field(description="Access токен")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                }
-            ]
-        }
+        json_schema_extra = AuthSchemas.ACCESS_TOKEN
 
 
 class TokenPair(BaseModel):
@@ -79,14 +52,7 @@ class TokenPair(BaseModel):
     refresh_token: TokenField = Field(description="Refresh токен")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "access_token": "eyJhbGciOiJIUzI1...",
-                    "refresh_token": "eyJhbGciOiJIUzI1..."
-                }
-            ]
-        }
+        json_schema_extra = AuthSchemas.TOKEN_PAIR
 
 
 class LoginRequest(SignupRequest):
@@ -96,11 +62,4 @@ class LoginRequest(SignupRequest):
 
     class Config:
         extra = "forbid"
-        json_schema_extra = {
-            "examples": [
-                {
-                    "email": "user@example.com",
-                    "password": "pa$$w0rd123"
-                }
-            ]
-        }
+        json_schema_extra = AuthSchemas.LOGIN_REQUEST

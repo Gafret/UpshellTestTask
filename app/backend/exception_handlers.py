@@ -23,20 +23,21 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     messages = ""
 
     for err in exc.errors():
+        print(err)
         # так как используется EmailStr для подробной валидации почты,
         # а формат вывода нам нужен собственный, обрабатываем особый случай
-        if "email" in err.get("loc") and err.get("type") == "value_error":
-            messages += "Некорректный формат электронной почты "
+        if "email" in err.get("loc") and (err.get("type") == "value_error" or err.get("type") == "string_type"):
+            messages += "Некорректный формат электронной почты. "
             continue
 
         elif err.get("type") == "extra_forbidden":
-            messages += f"В {err.get('loc')[0]} переданы избыточные поля "
+            messages += f"В {err.get('loc')[0]} переданы избыточные поля. "
 
         elif err.get("type") == "missing":
-            messages += f"В {err.get('loc')[0]} не передано поле '{err.get('loc')[-1]}' "
+            messages += f"В {err.get('loc')[0]} не передано поле '{err.get('loc')[-1]}'. "
 
         elif err.get("type") == "json_invalid":
-            messages += "Неверный формат JSON"
+            messages += "Неверный формат JSON. "
 
         else:
             messages += err.pop("msg") + " "

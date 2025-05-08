@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field
 
+from app.backend.openapi.schema_examples import DeviceSchemas
 from app.utils.validators import DeviceBrand, DeviceName, DevicePrice
 
 
@@ -19,13 +20,4 @@ class Device(BaseDevice, table=True):
     id: int | None = Field(primary_key=True, default=None, description="ID девайса")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "id": 1,
-                    "name": "XPS 13",
-                    "brand": "Dell",
-                    "price": 1299.99
-                }
-            ]
-        }
+        json_schema_extra = DeviceSchemas.DEVICE

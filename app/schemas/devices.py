@@ -1,5 +1,8 @@
 from pydantic import BaseModel, Field, model_validator
 
+from app.backend.const import ErrorTexts
+from app.backend.custom_exceptions import FieldValidationException
+from app.backend.openapi.schema_examples import DeviceSchemas
 from app.models.devices import BaseDevice
 from app.utils.validators import PageField, PageSizeField, OrderDevicePrice, OrderDeviceQuantity, DeviceBrand
 
@@ -10,15 +13,8 @@ class DeviceCreate(BaseDevice):
     pass
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "name": "XPS 13",
-                    "brand": "Dell",
-                    "price": 1299.99
-                }
-            ]
-        }
+        extra = "forbid"
+        json_schema_extra = DeviceSchemas.DEVICE_CREATE
 
 
 class DeviceFilterQueryParams(BaseModel):
@@ -34,7 +30,10 @@ class DeviceFilterQueryParams(BaseModel):
     def check_price_range(self):
         if ((self.price_min is not None and self.price_max is not None) and
                 self.price_min > self.price_max):
-            raise ValueError("Максимальная цена не может быть меньше минимальной цены")
+            raise FieldValidationException(
+                "value_error",
+                ErrorTexts.MAX_PRICE_LESS_THAN_MIN_PRICE
+            )
         return self
 
     @model_validator(mode="after")
@@ -43,7 +42,13 @@ class DeviceFilterQueryParams(BaseModel):
         for k, v in values.items():
             if v is not None:
                 return self
-        raise ValueError("Должен быть указан хотя бы один параметр фильтрации или пагинации")
+        raise FieldValidationException(
+            "value_error",
+            "Должен быть указан хотя бы один параметр фильтрации или пагинации"
+        )
+
+    class Config:
+        extra = "forbid"
 
 
 class DeviceFilterResult(BaseModel):
@@ -53,25 +58,7 @@ class DeviceFilterResult(BaseModel):
     total: int = Field(default=0, description="Итоговое количество, полученных элементов")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "items": [
-                        {
-                            "name": "iPhone 13",
-                            "brand": "Apple",
-                            "price": 999
-                        },
-                        {
-                            "name": "Samsung Galaxy S21",
-                            "brand": "Samsung",
-                            "price": 899
-                        }
-                    ],
-                    "total": 2
-                }
-            ]
-        }
+        json_schema_extra = DeviceSchemas.DEVICE_FILTER_RESULT
 
 
 class DeviceOrder(BaseDevice):
@@ -80,6 +67,9 @@ class DeviceOrder(BaseDevice):
     price: OrderDevicePrice = Field(description="Цена девайса")
     quantity: OrderDeviceQuantity = Field(description="Кол-во девайсов данной модели")
 
+    class Config:
+        extra = "forbid"
+
 
 class UserDeviceCart(BaseModel):
     """Корзина пользователя"""
@@ -87,26 +77,8 @@ class UserDeviceCart(BaseModel):
     items: list[DeviceOrder] = Field(description="Список позиций в корзине покупателя")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "items": [
-                        {
-                            "name": "Smartphone X",
-                            "brand": "TechBrand",
-                            "quantity": 2,
-                            "price": 399.99
-                        },
-                        {
-                            "name": "Laptop Pro",
-                            "brand": "CompTech",
-                            "quantity": 1,
-                            "price": 1299.99
-                        }
-                    ]
-                }
-            ]
-        }
+        extra = "forbid"
+        json_schema_extra = DeviceSchemas.USER_DEVICE_CART
 
 
 class FulfilledDeviceOrder(DeviceOrder):
@@ -124,26 +96,4 @@ class CartPurchaseResult(BaseModel):
     total_purchase_price: float | None = Field(default=None, description="Итоговая стоимость")
 
     class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "purchasedItems": [
-                        {
-                            "name": "Smartphone X",
-                            "brand": "TechBrand",
-                            "unitPrice": 399.99,
-                            "quantity": 2,
-                            "totalPrice": 799.98
-                        },
-                        {
-                            "name": "Laptop Pro",
-                            "brand": "CompTech",
-                            "unitPrice": 1299.99,
-                            "quantity": 1,
-                            "totalPrice": 1299.99
-                        }
-                    ],
-                    "totalPurchasePrice": 2099.97
-                }
-            ]
-        }
+        json_schema_extra = DeviceSchemas.CART_PURCHASE_RESULT

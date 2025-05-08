@@ -6,7 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.requests import Request
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from app.backend.const import Roles
+from app.backend.const import Roles, ErrorTexts
 from app.services.auth import AuthService
 
 
@@ -20,7 +20,7 @@ class CustomHTTPBearer(HTTPBearer):
         except HTTPException:
             raise HTTPException(
                 status_code=HTTP_401_UNAUTHORIZED,
-                detail="Неавторизованный пользователь"
+                detail=ErrorTexts.UNAUTHORIZED_USER
             )
 
 
@@ -38,7 +38,7 @@ def check_permission(required_role: Roles):
 
     def role_checker(token: Annotated[dict, Depends(check_jwt_token)]) -> dict:
         if token.get("role") != required_role:
-            raise HTTPException(status_code=403, detail="Пользователь не имеет прав доступа для этой операции")
+            raise HTTPException(status_code=403, detail=ErrorTexts.NO_PERMISSION)
         return token
 
     return role_checker

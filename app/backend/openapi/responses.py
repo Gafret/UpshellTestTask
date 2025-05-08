@@ -5,7 +5,7 @@ from app.schemas.base import ErrorResponse
 
 
 class AuthRouteResponses:
-    refresh_responses = {
+    REFRESH = {
         HTTP_200_OK: {"description": "Успешный ответ с новым access-токеном"},
         HTTP_400_BAD_REQUEST: {"description": "Неверный запрос",
                                "content": {
@@ -33,7 +33,7 @@ class AuthRouteResponses:
                                 "model": ErrorResponse},
     }
 
-    login_responses = {
+    LOGIN = {
         HTTP_200_OK: {"description": "Успешная аутентификация"},
         HTTP_400_BAD_REQUEST: {"description": "Ошибка в запросе",
                                "content": {
@@ -61,7 +61,7 @@ class AuthRouteResponses:
                                          "model": ErrorResponse},
     }
 
-    register_responses = {
+    REGISTER = {
         HTTP_201_CREATED: {"description": "Пользователь успешно зарегистрирован"},
         HTTP_400_BAD_REQUEST: {"description": "Некорректные данные запроса",
                                "content": {
@@ -103,7 +103,7 @@ class AuthRouteResponses:
 
 
 class DevicesRouteResponses:
-    add_device_responses = {
+    ADD_DEVICE = {
         HTTP_201_CREATED: {"description": "Товар успешно добавлен в каталог."},
         HTTP_400_BAD_REQUEST: {"description": "Ошибка в запросе. Некорректные данные.",
                                "content": {
@@ -142,7 +142,7 @@ class DevicesRouteResponses:
                              },
                              "model": ErrorResponse},
     }
-    devices_responses = {
+    GET_DEVICES = {
         HTTP_200_OK: {"description": "Список устройств"},
         HTTP_400_BAD_REQUEST: {"description": "Ошибка в запросе",
                                "content": {
@@ -157,7 +157,7 @@ class DevicesRouteResponses:
                                },
                                "model": ErrorResponse},
     }
-    buy_responses = {
+    BUY_DEVICES = {
         HTTP_200_OK: {"description": "Успешная покупка"},
         HTTP_400_BAD_REQUEST: {"description": "Некорректный запрос",
                                "content": {

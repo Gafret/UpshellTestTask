@@ -3,6 +3,7 @@ from sqlalchemy import func
 from sqlmodel import select, and_
 from starlette.status import HTTP_400_BAD_REQUEST
 
+from app.backend.const import ErrorTexts
 from app.models.devices import Device
 from app.schemas.devices import DeviceFilterQueryParams, DeviceFilterResult, UserDeviceCart, CartPurchaseResult, \
     FulfilledDeviceOrder
@@ -24,7 +25,7 @@ class DeviceService(BaseService):
         """Оформляет покупку корзины"""
 
         if len(purchase_order.items) == 0:
-            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Корзина покупок пустая")
+            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=ErrorTexts.EMPTY_CART)
 
         repo = DeviceDataManager(self.session)
 
@@ -36,14 +37,14 @@ class DeviceService(BaseService):
             db_device = repo.get_device(device)
 
             if db_device is None:
-                raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Товар недоступен для покупки")
+                raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=ErrorTexts.DEVICE_UNAVAILABLE_FOR_PURCHASE)
 
             if repo.get_device_count(device) < item.quantity:
-                raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Недостаточно товара на складе")
+                raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=ErrorTexts.NOT_ENOUGH_DEVICES)
 
             if db_device.price != item.price:
                 raise HTTPException(status_code=HTTP_400_BAD_REQUEST,
-                                    detail="Цена товара изменилась с момента добавления в корзину")
+                                    detail=ErrorTexts.PRICE_HAS_CHANGED)
 
             sub_total = item.price * item.quantity
             cart_position = FulfilledDeviceOrder(**item.model_dump(), total_price=sub_total)
@@ -105,9 +106,11 @@ class DeviceDataManager(BaseDataManager):
             return None
 
         if offset > len(models):
-            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Такой страницы не существует")
+            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=ErrorTexts.PAGE_DOESNT_EXIST)
 
         results = []
+
         for model in models:
             results.append(Device(**model.model_dump()))
+
         return results
